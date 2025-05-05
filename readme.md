@@ -53,6 +53,7 @@ A Laravel 12 application with Vue.js 3 for managing tasks with user authenticati
 
 - Frontend: http://localhost:8000
 - API: http://localhost:8000/api
+- Database: http://127.0.0.1:3306 (Check credentials in .env)
 
 ## API Documentation
 

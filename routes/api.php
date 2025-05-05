@@ -21,4 +21,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     
     Route::apiResource('tasks', TasksController::class)->except(['show']);
+    Route::get('/tasks/trashed', [TasksController::class, 'trashed'])->name('tasks.trashed');
+    Route::get('/tasks/completed', [TasksController::class, 'completed'])->name('tasks.completed');
+    Route::get('/tasks/pending', [TasksController::class, 'pending'])->name('tasks.pending');
+    Route::post('/tasks/{task}/complete', [TasksController::class, 'complete'])->name('tasks.complete');
 }); 

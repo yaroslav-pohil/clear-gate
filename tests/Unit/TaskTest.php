@@ -20,13 +20,11 @@ class TaskTest extends TestCase
             ->create([
                 'title' => 'Test Task',
                 'description' => 'This is a test task',
-                'status' => Task::STATUS_PENDING,
             ]);
         
         $this->assertDatabaseHas('tasks', [
             'title' => 'Test Task',
             'description' => 'This is a test task',
-            'status' => Task::STATUS_PENDING,
             'user_id' => $user->id,
         ]);
     }
@@ -43,21 +41,14 @@ class TaskTest extends TestCase
         $this->assertEquals($user->id, $task->user->id);
     }
     
-    public function test_task_status_enum(): void
+    public function test_task_completion(): void
     {
-        // Test pending status
-        $task = Task::factory()->pending()->create();
-        $this->assertEquals(Task::STATUS_PENDING, $task->status);
+        // Test uncompleted task
+        $task = Task::factory()->create();
         $this->assertNull($task->completed_at);
         
-        // Test in progress status
-        $task = Task::factory()->inProgress()->create();
-        $this->assertEquals(Task::STATUS_IN_PROGRESS, $task->status);
-        $this->assertNull($task->completed_at);
-        
-        // Test completed status
+        // Test completed task
         $task = Task::factory()->completed()->create();
-        $this->assertEquals(Task::STATUS_COMPLETED, $task->status);
         $this->assertNotNull($task->completed_at);
     }
 }

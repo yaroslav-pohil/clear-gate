@@ -76,4 +76,92 @@ class TasksController extends Controller
             'message' => 'Task deleted successfully'
         ]);
     }
+
+    /**
+     * Get all trashed tasks for the authenticated user.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function trashed(Request $request): JsonResponse
+    {
+        if ($request->user()?->cannot('view', Task::class)) {
+            abort(403, 'Forbidden');
+        }
+
+        $tasks = Task::onlyTrashed()
+            ->where('user_id', $request->user()->id)
+            ->latest()
+            ->get();
+        
+        return response()->json([
+            'data' => $tasks
+        ]);
+    }
+
+    /**
+     * Get all completed tasks for the authenticated user.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function completed(Request $request): JsonResponse
+    {
+        if ($request->user()?->cannot('view', Task::class)) {
+            abort(403, 'Forbidden');
+        }
+
+        $tasks = Task::where('user_id', $request->user()->id)
+            ->whereNotNull('completed_at')
+            ->orderBy('completed_at', 'desc')
+            ->get();
+        
+        return response()->json([
+            'data' => $tasks
+        ]);
+    }
+
+    /**
+     * Get all pending tasks for the authenticated user.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function pending(Request $request): JsonResponse
+    {
+        if ($request->user()?->cannot('view', Task::class)) {
+            abort(403, 'Forbidden');
+        }
+
+        $tasks = Task::where('user_id', $request->user()->id)
+            ->whereNull('completed_at')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return response()->json([
+            'data' => $tasks
+        ]);
+    }
+
+    /**
+     * Mark a task as completed.
+     *
+     * @param Request $request
+     * @param Task $task
+     * @return JsonResponse
+     */
+    public function complete(Request $request, Task $task): JsonResponse
+    {
+        if ($request->user()?->cannot('update', $task)) {
+            abort(403, 'Forbidden');
+        }
+
+        $task->completed_at = now();
+        $task->save();
+        
+        return response()->json([
+            'message' => 'Task completed successfully',
+            'data' => $task
+        ]);
+    }
 }

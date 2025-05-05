@@ -67,7 +67,6 @@ class TasksTest extends TestCase
                         'id',
                         'title',
                         'description',
-                        'status',
                         'user_id',
                         'completed_at',
                         'created_at',
@@ -89,7 +88,6 @@ class TasksTest extends TestCase
         $taskData = [
             'title' => 'New Task Title',
             'description' => 'New Task Description',
-            'status' => Task::STATUS_PENDING,
         ];
 
         $response = $this->postJson('/api/tasks', $taskData);
@@ -103,7 +101,6 @@ class TasksTest extends TestCase
                     'id',
                     'title',
                     'description',
-                    'status',
                     'user_id',
                     'created_at',
                     'updated_at',
@@ -127,16 +124,6 @@ class TasksTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['title', 'description']);
-
-        // Invalid status
-        $response = $this->postJson('/api/tasks', [
-            'title' => 'Test Task',
-            'description' => 'Test Description',
-            'status' => 'invalid_status',
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['status']);
     }
 
     public function test_authenticated_users_can_update_their_own_tasks(): void
@@ -144,14 +131,13 @@ class TasksTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $tasks = Task::factory()->pending()->create([
+        $tasks = Task::factory()->create([
             'user_id' => $user->id,
         ]);
 
         $updatedData = [
             'title' => 'Updated Task Title',
             'description' => 'Updated Task Description',
-            'status' => Task::STATUS_COMPLETED,
         ];
 
         $response = $this->putJson("/api/tasks/{$tasks->id}", $updatedData);
@@ -165,7 +151,6 @@ class TasksTest extends TestCase
                     'id',
                     'title',
                     'description',
-                    'status',
                     'user_id',
                     'created_at',
                     'updated_at',
@@ -176,8 +161,6 @@ class TasksTest extends TestCase
             'id' => $tasks->id,
             'title' => 'Updated Task Title',
             'description' => 'Updated Task Description',
-            'status' => Task::STATUS_COMPLETED,
-            'completed_at' => now(), // Assert that the completed_at field is set to the current date and time
         ]);
     }
 
@@ -220,7 +203,7 @@ class TasksTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonStructure(['message']);
 
-        $this->assertDatabaseMissing('tasks', [
+        $this->assertSoftDeleted('tasks', [
             'id' => $tasks->id,
         ]);
     }
@@ -242,6 +225,192 @@ class TasksTest extends TestCase
         // Verify the tasks was not deleted
         $this->assertDatabaseHas('tasks', [
             'id' => $tasks->id,
+        ]);
+    }
+
+    public function test_authenticated_users_can_get_their_trashed_tasks(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        // Create and delete some tasks for the user
+        $trashedTasks = Task::factory()->count(2)->create([
+            'user_id' => $user->id,
+        ]);
+        $trashedTasks->each->delete();
+
+        // Create a task for another user and delete it
+        $otherUser = User::factory()->create();
+        $otherTask = Task::factory()->create([
+            'user_id' => $otherUser->id,
+        ]);
+        $otherTask->delete();
+
+        // Create a non-deleted task
+        Task::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->getJson('/api/tasks/trashed');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data')
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'title',
+                        'description',
+                        'user_id',
+                        'deleted_at',
+                        'created_at',
+                        'updated_at',
+                    ],
+                ],
+            ]);
+
+        // Ensure we only get the trashed tasks belonging to the authenticated user
+        $response->assertJsonFragment(['user_id' => $user->id])
+            ->assertJsonMissing(['user_id' => $otherUser->id]);
+    }
+
+    public function test_authenticated_users_can_get_their_completed_tasks(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        // Create some completed tasks for the user
+        $completedTasks = Task::factory()->completed()->count(2)->create([
+            'user_id' => $user->id,
+        ]);
+
+        // Create a completed task for another user
+        $otherUser = User::factory()->create();
+        Task::factory()->completed()->create([
+            'user_id' => $otherUser->id,
+        ]);
+
+        // Create an uncompleted task
+        Task::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->getJson('/api/tasks/completed');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data')
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'title',
+                        'description',
+                        'user_id',
+                        'completed_at',
+                        'created_at',
+                        'updated_at',
+                    ],
+                ],
+            ]);
+
+        // Ensure we only get the completed tasks belonging to the authenticated user
+        $response->assertJsonFragment(['user_id' => $user->id])
+            ->assertJsonMissing(['user_id' => $otherUser->id]);
+    }
+
+    public function test_authenticated_users_can_get_their_pending_tasks(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        // Create some uncompleted tasks for the user
+        $pendingTasks = Task::factory()->count(2)->create([
+            'user_id' => $user->id,
+        ]);
+
+        // Create an uncompleted task for another user
+        $otherUser = User::factory()->create();
+        Task::factory()->create([
+            'user_id' => $otherUser->id,
+        ]);
+
+        // Create a completed task
+        Task::factory()->completed()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->getJson('/api/tasks/pending');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data')
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'title',
+                        'description',
+                        'user_id',
+                        'completed_at',
+                        'created_at',
+                        'updated_at',
+                    ],
+                ],
+            ]);
+
+        // Ensure we only get the uncompleted tasks belonging to the authenticated user
+        $response->assertJsonFragment(['user_id' => $user->id])
+            ->assertJsonMissing(['user_id' => $otherUser->id]);
+    }
+
+    public function test_authenticated_users_can_complete_their_tasks(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $task = Task::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->postJson("/api/tasks/{$task->id}/complete");
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'message',
+                'data' => [
+                    'id',
+                    'title',
+                    'description',
+                    'user_id',
+                    'completed_at',
+                    'created_at',
+                    'updated_at',
+                ],
+            ]);
+
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'completed_at' => now(),
+        ]);
+    }
+
+    public function test_users_cannot_complete_tasks_that_dont_belong_to_them(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $otherUser = User::factory()->create();
+        $task = Task::factory()->create([
+            'user_id' => $otherUser->id,
+        ]);
+
+        $response = $this->postJson("/api/tasks/{$task->id}/complete");
+
+        $response->assertForbidden();
+
+        // Verify the task was not completed
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'completed_at' => null,
         ]);
     }
 }

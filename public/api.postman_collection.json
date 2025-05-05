@@ -286,7 +286,208 @@
 							"_postman_previewlanguage": "json",
 							"header": [],
 							"cookie": [],
-							"body": "{\n    \"data\": [\n        {\n            \"id\": 1,\n            \"title\": \"Complete API documentation\",\n            \"description\": \"Create comprehensive API documentation for the Task Manager\",\n            \"status\": \"pending\",\n            \"user_id\": 1,\n            \"completed_at\": null,\n            \"created_at\": \"2023-05-05T15:00:00.000000Z\",\n            \"updated_at\": \"2023-05-05T15:00:00.000000Z\"\n        },\n        {\n            \"id\": 2,\n            \"title\": \"Implement frontend\",\n            \"description\": \"Develop frontend UI for the Task Manager\",\n            \"status\": \"in_progress\",\n            \"user_id\": 1,\n            \"completed_at\": null,\n            \"created_at\": \"2023-05-04T13:00:00.000000Z\",\n            \"updated_at\": \"2023-05-05T10:00:00.000000Z\"\n        }\n    ]\n}"
+							"body": "{\n    \"data\": [\n        {\n            \"id\": 1,\n            \"title\": \"Complete API documentation\",\n            \"description\": \"Create comprehensive API documentation for the Task Manager\",\n            \"user_id\": 1,\n            \"completed_at\": null,\n            \"created_at\": \"2023-05-05T15:00:00.000000Z\",\n            \"updated_at\": \"2023-05-05T15:00:00.000000Z\"\n        },\n        {\n            \"id\": 2,\n            \"title\": \"Implement frontend\",\n            \"description\": \"Develop frontend UI for the Task Manager\",\n            \"user_id\": 1,\n            \"completed_at\": null,\n            \"created_at\": \"2023-05-04T13:00:00.000000Z\",\n            \"updated_at\": \"2023-05-05T10:00:00.000000Z\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "List Trashed Tasks",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/trashed",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"trashed"
+							]
+						},
+						"description": "Retrieves all soft-deleted tasks belonging to the authenticated user. Tasks are sorted by deletion date, with most recently deleted tasks first."
+					},
+					"response": [
+						{
+							"name": "Trashed Tasks List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/tasks/trashed",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"tasks",
+										"trashed"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"id\": 1,\n            \"title\": \"Deleted Task\",\n            \"description\": \"This task has been deleted\",\n            \"user_id\": 1,\n            \"deleted_at\": \"2023-05-06T15:30:00.000000Z\",\n            \"created_at\": \"2023-05-05T15:00:00.000000Z\",\n            \"updated_at\": \"2023-05-06T15:30:00.000000Z\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "List Completed Tasks",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/completed",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"completed"
+							]
+						},
+						"description": "Retrieves all completed tasks belonging to the authenticated user. Tasks are sorted by completion date, with most recently completed tasks first."
+					},
+					"response": [
+						{
+							"name": "Completed Tasks List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/tasks/completed",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"tasks",
+										"completed"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"id\": 1,\n            \"title\": \"Completed Task\",\n            \"description\": \"This task has been completed\",\n            \"user_id\": 1,\n            \"completed_at\": \"2023-05-06T15:30:00.000000Z\",\n            \"created_at\": \"2023-05-05T15:00:00.000000Z\",\n            \"updated_at\": \"2023-05-06T15:30:00.000000Z\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "List Pending Tasks",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/pending",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"pending"
+							]
+						},
+						"description": "Retrieves all pending tasks belonging to the authenticated user. Tasks are sorted by creation date, with newest tasks first."
+					},
+					"response": [
+						{
+							"name": "Pending Tasks List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/tasks/pending",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"tasks",
+										"pending"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"id\": 1,\n            \"title\": \"Pending Task\",\n            \"description\": \"This task is pending\",\n            \"user_id\": 1,\n            \"completed_at\": null,\n            \"created_at\": \"2023-05-05T15:00:00.000000Z\",\n            \"updated_at\": \"2023-05-05T15:00:00.000000Z\"\n        }\n    ]\n}"
 						}
 					]
 				},
@@ -318,7 +519,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"New task\",\n    \"description\": \"Description of the new task\",\n    \"status\": \"pending\"\n}",
+							"raw": "{\n    \"title\": \"New task\",\n    \"description\": \"Description of the new task\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -356,7 +557,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"title\": \"New task\",\n    \"description\": \"Description of the new task\",\n    \"status\": \"pending\"\n}",
+									"raw": "{\n    \"title\": \"New task\",\n    \"description\": \"Description of the new task\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -379,7 +580,7 @@
 							"_postman_previewlanguage": "json",
 							"header": [],
 							"cookie": [],
-							"body": "{\n    \"message\": \"Task created successfully\",\n    \"data\": {\n        \"id\": 3,\n        \"title\": \"New task\",\n        \"description\": \"Description of the new task\",\n        \"status\": \"pending\",\n        \"user_id\": 1,\n        \"completed_at\": null,\n        \"created_at\": \"2023-05-06T14:30:00.000000Z\",\n        \"updated_at\": \"2023-05-06T14:30:00.000000Z\"\n    }\n}"
+							"body": "{\n    \"message\": \"Task created successfully\",\n    \"data\": {\n        \"id\": 3,\n        \"title\": \"New task\",\n        \"description\": \"Description of the new task\",\n        \"user_id\": 1,\n        \"completed_at\": null,\n        \"created_at\": \"2023-05-06T14:30:00.000000Z\",\n        \"updated_at\": \"2023-05-06T14:30:00.000000Z\"\n    }\n}"
 						},
 						{
 							"name": "Validation Error",
@@ -454,7 +655,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Updated task title\",\n    \"description\": \"Updated task description\",\n    \"status\": \"completed\"\n}",
+							"raw": "{\n    \"title\": \"Updated task title\",\n    \"description\": \"Updated task description\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -500,7 +701,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"title\": \"Updated task title\",\n    \"description\": \"Updated task description\",\n    \"status\": \"completed\"\n}",
+									"raw": "{\n    \"title\": \"Updated task title\",\n    \"description\": \"Updated task description\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -530,7 +731,7 @@
 							"_postman_previewlanguage": "json",
 							"header": [],
 							"cookie": [],
-							"body": "{\n    \"message\": \"Task updated successfully\",\n    \"data\": {\n        \"id\": 1,\n        \"title\": \"Updated task title\",\n        \"description\": \"Updated task description\",\n        \"status\": \"completed\",\n        \"user_id\": 1,\n        \"completed_at\": \"2023-05-06T15:30:00.000000Z\",\n        \"created_at\": \"2023-05-05T15:00:00.000000Z\",\n        \"updated_at\": \"2023-05-06T15:30:00.000000Z\"\n    }\n}"
+							"body": "{\n    \"message\": \"Task updated successfully\",\n    \"data\": {\n        \"id\": 1,\n        \"title\": \"Updated task title\",\n        \"description\": \"Updated task description\",\n        \"user_id\": 1,\n        \"completed_at\": \"2023-05-06T15:30:00.000000Z\",\n        \"created_at\": \"2023-05-05T15:00:00.000000Z\",\n        \"updated_at\": \"2023-05-06T15:30:00.000000Z\"\n    }\n}"
 						},
 						{
 							"name": "Unauthorized (Not owner)",
@@ -550,7 +751,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"title\": \"Updated task title\",\n    \"description\": \"Updated task description\",\n    \"status\": \"completed\"\n}",
+									"raw": "{\n    \"title\": \"Updated task title\",\n    \"description\": \"Updated task description\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -682,6 +883,125 @@
 										"api",
 										"tasks",
 										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Forbidden\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Complete Task",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/tasks/:id/complete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								":id",
+								"complete"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "The ID of the task to complete"
+								}
+							]
+						},
+						"description": "Marks a task as completed by setting its completed_at timestamp. Users can only complete their own tasks."
+					},
+					"response": [
+						{
+							"name": "Task Completed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/tasks/:id/complete",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"tasks",
+										":id",
+										"complete"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Task completed successfully\",\n    \"data\": {\n        \"id\": 1,\n        \"title\": \"Task to complete\",\n        \"description\": \"This task will be completed\",\n        \"user_id\": 1,\n        \"completed_at\": \"2023-05-06T15:30:00.000000Z\",\n        \"created_at\": \"2023-05-05T15:00:00.000000Z\",\n        \"updated_at\": \"2023-05-06T15:30:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Unauthorized (Not owner)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/tasks/:id/complete",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"tasks",
+										":id",
+										"complete"
 									],
 									"variable": [
 										{
