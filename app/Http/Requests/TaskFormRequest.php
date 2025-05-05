@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Http\Requests;
+
+use App\Models\Task;
+use Illuminate\Foundation\Http\FormRequest;
+
+class TaskFormRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true; // Authorization will be handled by the TaskPolicy
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'status' => [
+                'sometimes',
+                'string',
+                'in:' . implode(',', [
+                    Task::STATUS_PENDING,
+                    Task::STATUS_IN_PROGRESS,
+                    Task::STATUS_COMPLETED
+                ])
+            ],
+        ];
+    }
+}
