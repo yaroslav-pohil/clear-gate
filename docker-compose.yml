@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # Nginx Service
+  nginx:
+    image: nginx:alpine
+    container_name: task_manager_nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - task_manager_network
+
+  # PHP Service
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: task_manager_php
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - mysql
+    networks:
+      - task_manager_network
+
+  # MySQL Service
+  mysql:
+    image: mysql:8.4
+    container_name: task_manager_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: task_manager
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: password
+      MYSQL_USER: task_manager
+      SERVICE_NAME: mysql
+    volumes:
+      - task_manager_mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - task_manager_network
+
+  # Node.js Service
+  node:
+    build:
+      context: ./docker/node
+      dockerfile: Dockerfile
+    container_name: task_manager_node
+    volumes:
+      - ./:/var/www
+    working_dir: /var/www
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_APP_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_PORT=5173
+    networks:
+      - task_manager_network
+    depends_on:
+      - php
+
+networks:
+  task_manager_network:
+    driver: bridge
+
+volumes:
+  task_manager_mysql_data:
+    driver: local 
