@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem, type NavItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Head, usePage, router } from '@inertiajs/vue3';
+import { ref, onMounted } from 'vue';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import axios, { type AxiosResponse } from 'axios';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { AlertCircle } from 'lucide-vue-next';
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'My Tasks',
@@ -26,6 +25,8 @@ interface Task {
     deleted_at: string | null;
 }
 
+const page = usePage<SharedData>();
+
 const newTask = {
     id: 0,
     title: '',
@@ -37,25 +38,24 @@ const newTask = {
 } as Task;
 
 const currentTask = ref<Task>({ ...newTask });
-
 const tasks = ref<Task[]>([]);
-const clickedNavItem = ref<NavItem | null>(null);
-const sortedTasks = computed(() => {
-    return tasks.value.sort((a, b) => a.order - b.order);
-});
 
 const getTasks = () => {
-    axios.get(clickedNavItem.value?.href).then((response: AxiosResponse<{ data: Task[] }>) => {
+    let status = route().params.status || 'pending';
+    let url = route('tasks.' + status);
+
+    axios.get(url).then((response: AxiosResponse<{ data: Task[] }>) => {
         tasks.value = response.data.data;
     });
 };
 
-// Handle link clicked in NavMain
-const handleNavLinkClicked = (item: NavItem) => {
-    console.log('Link clicked in NavMain:', item);
-    clickedNavItem.value = item;
-    getTasks();
-};
+onMounted(() => {
+    if (!route().params.status) {
+        router.visit(route('dashboard', { status: 'pending' }));
+    } else {
+        getTasks();
+    }
+});
 
 const processTask = () => {
     if (currentTask.value.id) {
@@ -98,11 +98,10 @@ const cancelTask = () => {
 
     <Head title="Dashboard" />
 
-    <AppLayout :breadcrumbs="breadcrumbs" @link-clicked="handleNavLinkClicked">
+    <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-6 rounded-xl p-4">
             <div class="grid auto-rows-min gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card v-for="task in sortedTasks" :key="task.id"
-                    class="group hover:shadow-lg transition-all duration-200">
+                <Card v-for="task in tasks" :key="task.id" class="group hover:shadow-lg transition-all duration-200">
                     <CardHeader class="border-b flex items-center justify-center">
                         <CardTitle class="text-lg font-semibold">{{ task.title }}</CardTitle>
                     </CardHeader>
@@ -139,31 +138,33 @@ const cancelTask = () => {
                 </CardContent>
             </Card>
 
-            <Card class="border-primary/20" v-if="clickedNavItem?.href.includes('pending')" id="task-form">
-                <CardHeader>
-                    <CardTitle class="text-xl">{{ currentTask.id ? 'Edit' : 'Add New' }} Task</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form class="flex flex-col gap-4 w-full">
+            <Card class="border-primary/20" v-if="page.url.includes('status=pending')" id="task-form">
+                <form class="flex flex-col gap-4 w-full" @submit.prevent="processTask">
+                    <CardHeader>
+                        <CardTitle class="text-xl">{{ currentTask.id ? 'Edit' : 'Add New' }} Task</CardTitle>
+                    </CardHeader>
+                    <CardContent class="flex flex-col gap-4 w-full">
+
                         <Input hidden v-model="currentTask.id" />
 
                         <Input required class="w-full" v-model="currentTask.title" placeholder="Enter task title" />
                         <Input required class="w-full" v-model="currentTask.description"
                             placeholder="Enter task description" />
 
-                    </form>
-                </CardContent>
 
-                <CardFooter>
-                    <Button class="w-full" type="button" size="lg" @click="processTask">
-                        {{ currentTask.id ? 'Update' : 'Add' }} Task
-                    </Button>
+                    </CardContent>
 
-                    <Button class="w-full" type="button" size="lg" variant="outline" @click="cancelTask"
-                        v-if="currentTask.id">
-                        Cancel
-                    </Button>
-                </CardFooter>
+                    <CardFooter class="flex justify-end gap-2">
+                        <Button class="" type="submit" size="lg">
+                            {{ currentTask.id ? 'Update' : 'Add' }} Task
+                        </Button>
+
+                        <Button class="" type="button" size="lg" variant="outline" @click="cancelTask"
+                            v-if="currentTask.id">
+                            Cancel
+                        </Button>
+                    </CardFooter>
+                </form>
             </Card>
         </div>
     </AppLayout>

@@ -8,22 +8,20 @@ import { Link } from '@inertiajs/vue3';
 import { BookOpen, Check, Folder, LayoutGrid, Trash } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
-const emit = defineEmits(['linkClicked']);
-
 const mainNavItems: NavItem[] = [
     {
         title: 'Open Tasks',
-        href: route('tasks.pending'),
+        href: route('dashboard', { status: 'pending' }),
         icon: LayoutGrid,
     },
     {
         title: 'Completed Tasks',
-        href: route('tasks.completed'),
+        href: route('dashboard', { status: 'completed' }),
         icon: Check,
     },
     {
         title: 'Trashed Tasks',
-        href: route('tasks.trashed'),
+        href: route('dashboard', { status: 'trashed' }),
         icon: Trash,
     },
     
@@ -42,10 +40,6 @@ const footerNavItems: NavItem[] = [
         icon: BookOpen,
     },
 ];
-
-const handleLinkClicked = (item: NavItem) => {
-    emit('linkClicked', item);
-};
 </script>
 
 <template>
@@ -63,7 +57,7 @@ const handleLinkClicked = (item: NavItem) => {
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="mainNavItems" @link-clicked="handleLinkClicked" />
+            <NavMain :items="mainNavItems" />
         </SidebarContent>
 
         <SidebarFooter>

@@ -11,7 +11,7 @@
 			"description": "Endpoints for managing user authentication",
 			"item": [
 				{
-					"name": "Login",
+					"name": "Get Token",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -36,12 +36,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/login",
+							"raw": "{{base_url}}/api/sanctum/token",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"login"
+								"api",
+								"sanctum",
+								"token"
 							]
 						},
 						"description": "Authenticates a user and provides a token for accessing protected API endpoints."
@@ -73,12 +75,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{base_url}}/login",
+									"raw": "{{base_url}}/api/sanctum/token",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
-										"login"
+										"api",
+										"sanctum",
+										"token"
 									]
 								}
 							},
@@ -87,70 +91,7 @@
 							"_postman_previewlanguage": "json",
 							"header": [],
 							"cookie": [],
-							"body": "{\n    \"user\": {\n        \"id\": 1,\n        \"name\": \"User\",\n        \"email\": \"user@example.com\",\n        \"email_verified_at\": null,\n        \"created_at\": \"2023-05-05T12:00:00.000000Z\",\n        \"updated_at\": \"2023-05-05T12:00:00.000000Z\"\n    },\n    \"token\": \"1|laravel_sanctum_token_example\"\n}"
-						}
-					]
-				},
-				{
-					"name": "Logout",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/logout",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"logout"
-							]
-						},
-						"description": "Logs out the currently authenticated user and invalidates the token."
-					},
-					"response": [
-						{
-							"name": "Successful Logout",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/logout",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"logout"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [],
-							"cookie": [],
-							"body": "{\n    \"message\": \"Successfully logged out\"\n}"
+							"body": "laravel_sanctum_token_example"
 						}
 					]
 				},
@@ -536,7 +477,7 @@
 								"tasks"
 							]
 						},
-						"description": "Creates a new task for the authenticated user.\n\n**Required fields:**\n- title (string, max 255 chars)\n- description (string)\n\n**Optional fields:**\n- status (string): One of \"pending\", \"in_progress\", or \"completed\". Defaults to \"pending\"."
+						"description": "Creates a new task for the authenticated user.\n\n**Required fields:**\n- title (string, max 255 chars)\n- description (string)"
 					},
 					"response": [
 						{
@@ -600,7 +541,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"status\": \"pending\"\n}",
+									"raw": "{\n    \"title\": \"New task\",\n    \"description\": \"Description of the new task\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -680,7 +621,7 @@
 								}
 							]
 						},
-						"description": "Updates an existing task. Users can only update their own tasks.\n\n**Required fields:**\n- title (string, max 255 chars)\n- description (string)\n\n**Optional fields:**\n- status (string): One of \"pending\", \"in_progress\", or \"completed\""
+						"description": "Updates an existing task. Users can only update their own tasks.\n\n**Required fields:**\n- title (string, max 255 chars)\n- description (string)\n"
 					},
 					"response": [
 						{

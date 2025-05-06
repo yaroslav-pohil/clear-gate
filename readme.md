@@ -59,6 +59,14 @@ A Laravel 12 application with Vue.js 3 for managing tasks with user authenticati
 
 The API is documented using a Postman collection. Import the `task_manager_api.postman_collection.json` file into Postman to explore and test the API endpoints.
 
+If everything is ok, the application login page will look like this:
+
+![alt text](login.png)
+
+and the dashboard page will look like this:
+
+![alt text](dashboard.png)
+
 ## Testing
 
 To run tests:
